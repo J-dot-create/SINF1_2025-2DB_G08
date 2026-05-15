@@ -14,7 +14,7 @@ $artists = $bll->getAllArtists();
     <?php if ($artists && count($artists) > 0): ?>
         <?php foreach ($artists as $artist): ?>
             <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card h-100 shadow-sm border-0">
+                <div class="card artist-card h-100 shadow-sm border-0">
                     <div class="card-body">
                         <h5 class="card-title text-primary">
                             <?php echo htmlspecialchars($artist['name']); ?>

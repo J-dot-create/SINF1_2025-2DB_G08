@@ -18,7 +18,7 @@ $events = $bll->getAllEvents();
     <?php if ($events && count($events) > 0): ?>
         <?php foreach ($events as $event): ?>
             <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card h-100 shadow-sm border-0">
+                <div class="card event-card h-100 shadow-sm border-0">
                     <div class="card-header bg-primary text-white">
                         <span class="badge bg-light text-primary float-end">
                             <?php echo htmlspecialchars($event['event_type']); ?>

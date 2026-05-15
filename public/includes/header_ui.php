@@ -13,7 +13,7 @@ $roleId = $_SESSION['role_id'] ?? $_SESSION['id_role'] ?? null;
 $userName = $_SESSION['user_name'] ?? 'Utilizador';
 
 // Base URL do projeto
-$baseUrl = '/Sinf_Trabalho/public';
+$baseUrl = '/SINF1_2025-2DB_G08/public';
 ?>
 <!DOCTYPE html>
 <html lang="pt">
@@ -26,6 +26,7 @@ $baseUrl = '/Sinf_Trabalho/public';
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
         rel="stylesheet"
     >
+    <link rel="stylesheet" href="/SINF1_2025-2DB_G08/public/css/style.css">
 
     <link rel="stylesheet" href="<?php echo $baseUrl; ?>/assets/css/style.css">
 </head>

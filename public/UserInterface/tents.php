@@ -16,7 +16,7 @@ $tents = $bll->getAllTents();
             <?php $average = $bll->getAverageTentRating($tent['id_tent']); ?>
 
             <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card h-100 shadow-sm border-0">
+                <div class="card tent-card h-100 shadow-sm border-0">
                     <div class="card-header bg-success text-white">
                         <span class="badge bg-light text-success float-end">
                             <?php echo htmlspecialchars($tent['acronym']); ?>

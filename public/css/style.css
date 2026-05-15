@@ -1,0 +1,114 @@
+/* Estilos gerais */
+body {
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+/* Cabeçalhos */
+h1, h2, h3, h4, h5 {
+    font-weight: 600;
+}
+
+/* Cartões */
+.card {
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.card-header {
+    font-weight: 600;
+}
+
+/* Efeito visual nos cartões */
+.event-card,
+.tent-card,
+.artist-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.event-card:hover,
+.tent-card:hover,
+.artist-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.14);
+}
+
+/* Botões */
+.btn {
+    border-radius: 8px;
+}
+
+/* Menu */
+.nav-link {
+    transition: opacity 0.2s ease, padding-left 0.2s ease;
+}
+
+.nav-link:hover {
+    opacity: 0.85;
+    padding-left: 12px;
+}
+
+/* Sidebar admin */
+.admin-sidebar {
+    min-height: 100vh;
+}
+
+/* Tabelas */
+.table th {
+    white-space: nowrap;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* Ratings */
+.rating-value {
+    font-weight: bold;
+    color: #ffc107;
+}
+
+/* Alertas */
+.alert {
+    border-radius: 10px;
+}
+
+/* Formulários */
+.form-control,
+.form-select {
+    border-radius: 8px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
+}
+
+/* Página inicial */
+.hero-section {
+    background: linear-gradient(135deg, #0d6efd, #6610f2);
+    color: white;
+    border-radius: 18px;
+    padding: 40px;
+    margin-bottom: 30px;
+}
+
+/* Rodapé */
+footer {
+    margin-top: 40px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 24px;
+    }
+
+    .display-5 {
+        font-size: 2rem;
+    }
+
+    .admin-sidebar {
+        min-height: auto;
+    }
+}
