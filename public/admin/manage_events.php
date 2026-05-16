@@ -2,6 +2,11 @@
 include '../includes/header_admin.php';
 
 $message = "";
+$eventToEdit = null;
+
+if (isset($_GET['edit'])) {
+    $eventToEdit = $bll->getEventById(intval($_GET['edit']));
+}
 
 // Criar novo evento
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_event'])) {
@@ -17,6 +22,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_event'])) {
             $message = "Evento criado com sucesso.";
         } else {
             $message = "Erro ao criar evento.";
+        }
+    } else {
+        $message = "Preenche todos os campos obrigatórios.";
+    }
+}
+
+// Atualizar evento existente
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_event'])) {
+    $id_event = intval($_POST['id_event'] ?? 0);
+    $name = trim($_POST['name'] ?? '');
+    $description = trim($_POST['description'] ?? '');
+    $event_date = $_POST['event_date'] ?? '';
+    $location = trim($_POST['location'] ?? '');
+    $event_type = trim($_POST['event_type'] ?? '');
+    $id_tent = !empty($_POST['id_tent']) ? intval($_POST['id_tent']) : null;
+
+    if (!empty($id_event) && !empty($name) && !empty($event_date) && !empty($location) && !empty($event_type)) {
+        if ($bll->updateEvent($id_event, $name, $description, $event_date, $location, $event_type, $id_tent)) {
+            $message = "Evento atualizado com sucesso.";
+        } else {
+            $message = "Erro ao atualizar evento.";
         }
     } else {
         $message = "Preenche todos os campos obrigatórios.";
@@ -48,43 +74,48 @@ $tents = $bll->getAllTents();
 
 <div class="card shadow-sm border-0 mb-4">
     <div class="card-header bg-primary text-white">
-        Criar novo evento
+        <?php echo $eventToEdit ? 'Editar evento' : 'Criar novo evento'; ?>
     </div>
 
     <div class="card-body">
         <form method="POST" action="manage_events.php">
-            <input type="hidden" name="create_event" value="1">
+            <?php if ($eventToEdit): ?>
+                <input type="hidden" name="update_event" value="1">
+                <input type="hidden" name="id_event" value="<?php echo htmlspecialchars($eventToEdit['id_event']); ?>">
+            <?php else: ?>
+                <input type="hidden" name="create_event" value="1">
+            <?php endif; ?>
 
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Nome *</label>
-                    <input type="text" name="name" class="form-control" required>
+                    <input type="text" name="name" class="form-control" value="<?php echo htmlspecialchars($eventToEdit['name'] ?? ''); ?>" required>
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Data e hora *</label>
-                    <input type="datetime-local" name="event_date" class="form-control" required>
+                    <input type="datetime-local" name="event_date" class="form-control" value="<?php echo $eventToEdit ? date('Y-m-d\TH:i', strtotime($eventToEdit['event_date'])) : ''; ?>" required>
                 </div>
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Descrição</label>
-                <textarea name="description" class="form-control" rows="3"></textarea>
+                <textarea name="description" class="form-control" rows="3"><?php echo htmlspecialchars($eventToEdit['description'] ?? ''); ?></textarea>
             </div>
 
             <div class="row">
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Local *</label>
-                    <input type="text" name="location" class="form-control" required>
+                    <input type="text" name="location" class="form-control" value="<?php echo htmlspecialchars($eventToEdit['location'] ?? ''); ?>" required>
                 </div>
 
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Tipo *</label>
                     <select name="event_type" class="form-select" required>
                         <option value="">Escolher tipo</option>
-                        <option value="Academic ceremony">Cerimónia académica</option>
-                        <option value="Concert">Concerto</option>
-                        <option value="Cultural activity">Atividade cultural</option>
+                        <option value="Academic ceremony" <?php echo (($eventToEdit['event_type'] ?? '') === 'Academic ceremony') ? 'selected' : ''; ?>>Cerimónia académica</option>
+                        <option value="Concert" <?php echo (($eventToEdit['event_type'] ?? '') === 'Concert') ? 'selected' : ''; ?>>Concerto</option>
+                        <option value="Cultural activity" <?php echo (($eventToEdit['event_type'] ?? '') === 'Cultural activity') ? 'selected' : ''; ?>>Atividade cultural</option>
                     </select>
                 </div>
 
@@ -95,7 +126,7 @@ $tents = $bll->getAllTents();
 
                         <?php if ($tents): ?>
                             <?php foreach ($tents as $tent): ?>
-                                <option value="<?php echo $tent['id_tent']; ?>">
+                                <option value="<?php echo $tent['id_tent']; ?>" <?php echo (($eventToEdit['id_tent'] ?? '') == $tent['id_tent']) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($tent['name']); ?>
                                 </option>
                             <?php endforeach; ?>
@@ -105,8 +136,13 @@ $tents = $bll->getAllTents();
             </div>
 
             <button type="submit" class="btn btn-primary">
-                Criar evento
+                <?php echo $eventToEdit ? 'Guardar alterações' : 'Criar evento'; ?>
             </button>
+            <?php if ($eventToEdit): ?>
+                <a href="manage_events.php" class="btn btn-secondary">
+                    Cancelar
+                </a>
+            <?php endif; ?>
         </form>
     </div>
 </div>
@@ -146,8 +182,15 @@ $tents = $bll->getAllTents();
                             <td><?php echo htmlspecialchars($event['location']); ?></td>
 
                             <td>
-                                <a 
-                                    href="../UserInterface/event_detail.php?id=<?php echo $event['id_event']; ?>" 
+                                <a
+                                    href="manage_events.php?edit=<?php echo $event['id_event']; ?>"
+                                    class="btn btn-sm btn-outline-secondary"
+                                >
+                                    Editar
+                                </a>
+
+                                <a
+                                    href="../UserInterface/event_detail.php?id=<?php echo $event['id_event']; ?>"
                                     class="btn btn-sm btn-outline-primary"
                                 >
                                     Ver

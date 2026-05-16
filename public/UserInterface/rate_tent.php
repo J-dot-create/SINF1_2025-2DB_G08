@@ -1,10 +1,12 @@
 <?php
 include '../includes/header_ui.php';
 
-if (!isset($_SESSION['id_user'])) {
+if (!isset($_SESSION['id_user']) && !isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
 }
+
+$id_user = $_SESSION['id_user'] ?? $_SESSION['user_id'];
 
 $id_tent = $_GET['id'] ?? null;
 
@@ -25,10 +27,9 @@ if (!$tent) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $score = intval($_POST['score']);
-    $comment = trim($_POST['comment']);
 
     if ($score >= 1 && $score <= 5) {
-        $bll->rateTent($_SESSION['id_user'], $id_tent, $score, $comment);
+        $bll->rateTent($id_user, $id_tent, $score);
         $message = "Avaliação registada com sucesso.";
     } else {
         $message = "A avaliação tem de estar entre 1 e 5.";
@@ -59,11 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <option value="4">4 - Boa</option>
                     <option value="5">5 - Excelente</option>
                 </select>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Comentário</label>
-                <textarea name="comment" class="form-control" rows="4" placeholder="Comentário opcional"></textarea>
             </div>
 
             <button type="submit" class="btn btn-warning">

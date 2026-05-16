@@ -66,6 +66,18 @@ class BusinessLogicLayer {
         return $user;
     }
 
+    // Compatibilidade com dados antigos importados antes de se usar password_hash().
+    if (hash_equals($user['password_hash'], $password)) {
+        $newHash = password_hash($password, PASSWORD_DEFAULT);
+        $this->dal->executeNonQuery(
+            "UPDATE user SET password_hash = ? WHERE id_user = ?",
+            [$newHash, $user['id_user']],
+            "si"
+        );
+        $user['password_hash'] = $newHash;
+        return $user;
+    }
+
     return false;
 }
 
@@ -194,38 +206,38 @@ public function removeEventFromAgenda($id_user, $id_event) {
     return $this->dal->executeQuery($query, [$id_user, $id_event], "ii");
 }
 
-public function rateEvent($id_user, $id_event, $score, $comment = null) {
+public function rateEvent($id_user, $id_event, $score) {
     $check = "SELECT * FROM rating 
               WHERE id_user = ? AND id_event = ?";
     $exists = $this->dal->executeSelect($check, [$id_user, $id_event], "ii");
 
     if (!empty($exists)) {
         $query = "UPDATE rating 
-                  SET score = ?, comment = ?
+                  SET score = ?
                   WHERE id_user = ? AND id_event = ?";
-        return $this->dal->executeQuery($query, [$score, $comment, $id_user, $id_event], "isii");
+        return $this->dal->executeQuery($query, [$score, $id_user, $id_event], "iii");
     }
 
-    $query = "INSERT INTO rating (id_user, id_event, score, comment) 
-              VALUES (?, ?, ?, ?)";
-    return $this->dal->executeQuery($query, [$id_user, $id_event, $score, $comment], "iiis");
+    $query = "INSERT INTO rating (id_user, id_event, score)
+              VALUES (?, ?, ?)";
+    return $this->dal->executeQuery($query, [$id_user, $id_event, $score], "iii");
 }
 
-public function rateTent($id_user, $id_tent, $score, $comment = null) {
+public function rateTent($id_user, $id_tent, $score) {
     $check = "SELECT * FROM rating 
               WHERE id_user = ? AND id_tent = ?";
     $exists = $this->dal->executeSelect($check, [$id_user, $id_tent], "ii");
 
     if (!empty($exists)) {
         $query = "UPDATE rating 
-                  SET score = ?, comment = ?
+                  SET score = ?
                   WHERE id_user = ? AND id_tent = ?";
-        return $this->dal->executeQuery($query, [$score, $comment, $id_user, $id_tent], "isii");
+        return $this->dal->executeQuery($query, [$score, $id_user, $id_tent], "iii");
     }
 
-    $query = "INSERT INTO rating (id_user, id_tent, score, comment) 
-              VALUES (?, ?, ?, ?)";
-    return $this->dal->executeQuery($query, [$id_user, $id_tent, $score, $comment], "iiis");
+    $query = "INSERT INTO rating (id_user, id_tent, score)
+              VALUES (?, ?, ?)";
+    return $this->dal->executeQuery($query, [$id_user, $id_tent, $score], "iii");
 }
 
 
@@ -240,6 +252,18 @@ public function createEvent($name, $description, $event_date, $location, $event_
         $query,
         [$name, $description, $event_date, $location, $event_type, $id_tent],
         "sssssi"
+    ) > 0;
+}
+
+public function updateEvent($id_event, $name, $description, $event_date, $location, $event_type, $id_tent = null) {
+    $query = "UPDATE event
+              SET name = ?, description = ?, event_date = ?, location = ?, event_type = ?, id_tent = ?
+              WHERE id_event = ?";
+
+    return $this->dal->executeNonQuery(
+        $query,
+        [$name, $description, $event_date, $location, $event_type, $id_tent, $id_event],
+        "sssssii"
     ) > 0;
 }
 
@@ -491,6 +515,38 @@ public function getUpcomingAlerts($hours = 48) {
               ORDER BY event_date ASC";
 
     return $this->dal->executeSelect($query, [$hours], "i");
+}
+
+public function getAdminStats() {
+    // Agrega estatisticas simples para o painel principal sem expor logica SQL na interface.
+    $stats = [];
+
+    $stats['total_events'] = $this->dal->executeSelect("SELECT COUNT(*) AS total FROM event")[0]['total'] ?? 0;
+    $stats['total_artists'] = $this->dal->executeSelect("SELECT COUNT(*) AS total FROM artist")[0]['total'] ?? 0;
+    $stats['total_tents'] = $this->dal->executeSelect("SELECT COUNT(*) AS total FROM tent")[0]['total'] ?? 0;
+    $stats['total_users'] = $this->dal->executeSelect("SELECT COUNT(*) AS total FROM user")[0]['total'] ?? 0;
+
+    $topEvent = $this->dal->executeSelect(
+        "SELECT e.name, COUNT(pa.id_user) AS agenda_count
+         FROM event e
+         LEFT JOIN personalagenda pa ON e.id_event = pa.id_event
+         GROUP BY e.id_event, e.name
+         ORDER BY agenda_count DESC, e.event_date ASC
+         LIMIT 1"
+    );
+    $stats['most_popular_event'] = $topEvent[0] ?? null;
+
+    $topTent = $this->dal->executeSelect(
+        "SELECT t.name, AVG(r.score) AS average_rating
+         FROM tent t
+         LEFT JOIN rating r ON t.id_tent = r.id_tent
+         GROUP BY t.id_tent, t.name
+         ORDER BY average_rating DESC
+         LIMIT 1"
+    );
+    $stats['highest_rated_tent'] = $topTent[0] ?? null;
+
+    return $stats;
 }
 
 

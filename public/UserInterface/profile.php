@@ -7,12 +7,12 @@ require_once __DIR__ . '/../../src/bll/BusinessLogicLayer.php';
 
 $bll = new BusinessLogicLayer();
 
-if (!isset($_SESSION['id_user'])) {
+if (!isset($_SESSION['id_user']) && !isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
 }
 
-$id_user = $_SESSION['id_user'];
+$id_user = $_SESSION['id_user'] ?? $_SESSION['user_id'];
 $message = "";
 $error = "";
 

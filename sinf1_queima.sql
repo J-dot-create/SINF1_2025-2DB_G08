@@ -179,8 +179,8 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id_user`, `name`, `email`, `password_hash`, `id_role`) VALUES
-(1, 'Admin Queima', 'admin@queimaporto.pt', 'admin123', 1),
-(2, 'João Estudante', 'joao@estudante.pt', 'joao123', 2);
+(1, 'Admin Queima', 'admin@queimaporto.pt', '$2y$10$lqJBLVugg647PYVj/AUltO/00RrnvmDOCAJT7Z8guTR5m9j1M7uQq', 1),
+(2, 'João Estudante', 'joao@estudante.pt', '$2y$10$IBLd7OJHYJXQKhucU3fnIOkqjWR9VHAgk/WaVm9dZ94e9omK1vCRy', 2);
 
 --
 -- Índices para tabelas despejadas

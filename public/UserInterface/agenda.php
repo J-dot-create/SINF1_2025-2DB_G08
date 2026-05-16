@@ -1,12 +1,12 @@
 <?php
 include '../includes/header_ui.php';
 
-if (!isset($_SESSION['id_user'])) {
+if (!isset($_SESSION['id_user']) && !isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
 }
 
-$id_user = $_SESSION['id_user'];
+$id_user = $_SESSION['id_user'] ?? $_SESSION['user_id'];
 $message = "";
 
 if (isset($_GET['add'])) {

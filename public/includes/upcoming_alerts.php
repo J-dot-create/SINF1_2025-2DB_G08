@@ -15,7 +15,7 @@ $upcomingAlerts = $bll->getUpcomingAlerts(48);
                     em
                     <?php echo htmlspecialchars($alertEvent['location']); ?>
 
-                    <a href="/Sinf_Trabalho/public/UserInterface/event_detail.php?id=<?php echo $alertEvent['id_event']; ?>">
+                    <a href="/SINF1_2025-2DB_G08/public/UserInterface/event_detail.php?id=<?php echo $alertEvent['id_event']; ?>">
                         Ver detalhes
                     </a>
                 </li>

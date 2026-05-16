@@ -5,6 +5,6 @@
     </div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/Sinf_Trabalho/public/js/main.js"></script>
+<script src="/SINF1_2025-2DB_G08/public/js/main.js"></script>
 </body>
 </html>

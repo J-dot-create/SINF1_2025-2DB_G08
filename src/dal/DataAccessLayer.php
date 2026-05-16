@@ -55,6 +55,13 @@ class DataAccessLayer {
         return $affectedRows;
     }
 
+    /**
+     * Alias para queries de escrita usado por algumas funcoes da BLL.
+     */
+    public function executeQuery($query, $params = [], $types = "") {
+        return $this->executeNonQuery($query, $params, $types) > 0;
+    }
+
     public function __destruct() {
         if ($this->conn) {
             $this->conn->close();

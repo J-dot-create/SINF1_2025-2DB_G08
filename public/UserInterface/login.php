@@ -24,8 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($user) {
         // Set session variables
         $_SESSION['user_id'] = $user['id_user'];
+        $_SESSION['id_user'] = $user['id_user'];
         $_SESSION['user_name'] = $user['name'];
         $_SESSION['role_id'] = $user['id_role'];
+        $_SESSION['id_role'] = $user['id_role'];
         
         // Redirect based on user role (1 = Admin, 2 = Student)
         if ($user['id_role'] == 1) {
