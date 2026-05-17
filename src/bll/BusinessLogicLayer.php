@@ -15,8 +15,35 @@ class BusinessLogicLayer {
     /**
      * Exemplo: Obter todos os eventos da base de dados
      */
-    public function getAllEvents() {
-        return $this->dal->executeSelect("SELECT * FROM event ORDER BY event_date ASC");
+    public function getAllEvents($sortBy = 'date') {
+        $orderBy = "e.event_date ASC";
+
+        if ($sortBy === 'popularity') {
+            $orderBy = "popularity_count DESC, e.event_date ASC";
+        } elseif ($sortBy === 'rating') {
+            $orderBy = "average_rating DESC, rating_count DESC, e.event_date ASC";
+        }
+
+        $query = "SELECT 
+                    e.*,
+                    COALESCE(pa_stats.popularity_count, 0) AS popularity_count,
+                    COALESCE(rating_stats.average_rating, 0) AS average_rating,
+                    COALESCE(rating_stats.rating_count, 0) AS rating_count
+                  FROM event e
+                  LEFT JOIN (
+                      SELECT id_event, COUNT(*) AS popularity_count
+                      FROM personalagenda
+                      GROUP BY id_event
+                  ) pa_stats ON e.id_event = pa_stats.id_event
+                  LEFT JOIN (
+                      SELECT id_event, AVG(score) AS average_rating, COUNT(*) AS rating_count
+                      FROM rating
+                      WHERE id_event IS NOT NULL
+                      GROUP BY id_event
+                  ) rating_stats ON e.id_event = rating_stats.id_event
+                  ORDER BY $orderBy";
+
+        return $this->dal->executeSelect($query);
     }
 
     /**
@@ -52,6 +79,7 @@ class BusinessLogicLayer {
      * Devolve os dados do utilizador se tiver sucesso, ou null caso contrário.
      */
     public function loginUser($email, $password) {
+    $email = trim($email);
     $query = "SELECT * FROM user WHERE email = ? LIMIT 1";
 
     $result = $this->dal->executeSelect($query, [$email], "s");
@@ -61,13 +89,14 @@ class BusinessLogicLayer {
     }
 
     $user = $result[0];
+    $storedPassword = (string)($user['password_hash'] ?? '');
 
-    if (password_verify($password, $user['password_hash'])) {
+    if (password_verify($password, $storedPassword)) {
         return $user;
     }
 
-    // Compatibilidade com dados antigos importados antes de se usar password_hash().
-    if (hash_equals($user['password_hash'], $password)) {
+    // Compatibilidade com bases importadas onde a coluna tem texto simples.
+    if ($storedPassword !== '' && hash_equals(trim($storedPassword), $password)) {
         $newHash = password_hash($password, PASSWORD_DEFAULT);
         $this->dal->executeNonQuery(
             "UPDATE user SET password_hash = ? WHERE id_user = ?",
