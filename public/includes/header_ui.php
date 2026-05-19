@@ -82,16 +82,16 @@ $baseUrl = '/SINF1_2025-2DB_G08/public';
                         </a>
                     </li>
 
+                    <li class="nav-item">
+                        <a class="nav-link text-info" href="<?php echo $baseUrl; ?>/UserInterface/agenda.php">
+                            A Minha Agenda
+                        </a>
+                    </li>
+
                     <?php if ($roleId == 1): ?>
                         <li class="nav-item">
                             <a class="nav-link text-warning" href="<?php echo $baseUrl; ?>/admin/dashboard.php">
                                 Painel de Administração
-                            </a>
-                        </li>
-                    <?php else: ?>
-                        <li class="nav-item">
-                            <a class="nav-link text-info" href="<?php echo $baseUrl; ?>/UserInterface/agenda.php">
-                                A Minha Agenda
                             </a>
                         </li>
                     <?php endif; ?>

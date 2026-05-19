@@ -81,6 +81,12 @@ if (!$userId || $roleId != 1) {
             </li>
 
             <li class="nav-item">
+                <a href="../UserInterface/agenda.php" class="nav-link text-info">
+                    A Minha Agenda
+                </a>
+            </li>
+
+            <li class="nav-item">
                 <a href="../UserInterface/logout.php" class="nav-link text-danger">
                     Terminar Sessão
                 </a>
