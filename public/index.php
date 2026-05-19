@@ -4,7 +4,6 @@ require_once __DIR__ . '/../src/bll/BusinessLogicLayer.php';
 $bll = new BusinessLogicLayer();
 $events = $bll->getAllEvents();
 ?>
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -59,4 +58,3 @@ $events = $bll->getAllEvents();
 </div>
 
 <?php include 'includes/footer.php'; ?>
-//dfddggd 
