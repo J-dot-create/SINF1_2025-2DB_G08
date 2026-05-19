@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 15-Abr-2026 às 09:33
+-- Tempo de geração: 19-Maio-2026 às 17:53
 -- Versão do servidor: 10.4.32-MariaDB
 -- versão do PHP: 8.2.12
 
@@ -27,6 +27,7 @@ SET time_zone = "+00:00";
 -- Estrutura da tabela `artist`
 --
 
+DROP TABLE IF EXISTS `artist`;
 CREATE TABLE `artist` (
   `id_artist` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
@@ -35,12 +36,21 @@ CREATE TABLE `artist` (
   `biography` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Extraindo dados da tabela `artist`
+--
+
+INSERT INTO `artist` (`id_artist`, `name`, `musical_genre`, `country`, `biography`) VALUES
+(1, 'Dillaz', 'Hip-Hop', 'Portugal', 'Artista português de hip-hop.'),
+(2, 'Bárbara Tinoco', 'Pop', 'Portugal', 'Cantora e compositora portuguesa.');
+
 -- --------------------------------------------------------
 
 --
 -- Estrutura da tabela `event`
 --
 
+DROP TABLE IF EXISTS `event`;
 CREATE TABLE `event` (
   `id_event` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
@@ -65,6 +75,7 @@ INSERT INTO `event` (`id_event`, `name`, `description`, `event_date`, `location`
 -- Estrutura da tabela `event_artist`
 --
 
+DROP TABLE IF EXISTS `event_artist`;
 CREATE TABLE `event_artist` (
   `id_event` int(11) NOT NULL,
   `id_artist` int(11) NOT NULL
@@ -76,6 +87,7 @@ CREATE TABLE `event_artist` (
 -- Estrutura da tabela `faculty`
 --
 
+DROP TABLE IF EXISTS `faculty`;
 CREATE TABLE `faculty` (
   `id_faculty` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
@@ -89,8 +101,9 @@ CREATE TABLE `faculty` (
 --
 
 INSERT INTO `faculty` (`id_faculty`, `name`, `acronym`, `description`, `color`) VALUES
-(1, 'Faculdade de Engenharia', 'FEUP', 'Faculdade de Engenharia da Universidade do Porto', 'Castanho'),
-(2, 'Faculdade de Economia', 'FEP', 'Faculdade de Economia da Universidade do Porto', 'Vermelho');
+(1, 'Faculdade de Engenharia', 'FEUP', 'Faculdade de Engenharia da Universidade do Porto', '#883a3a'),
+(2, 'Faculdade de Economia', 'FEP', 'Faculdade de Economia da Universidade do Porto', '#ff0000'),
+(3, 'Instituto Superior de Engenharia do Porto', 'ISEP', '', '#e83b3b');
 
 -- --------------------------------------------------------
 
@@ -98,10 +111,18 @@ INSERT INTO `faculty` (`id_faculty`, `name`, `acronym`, `description`, `color`) 
 -- Estrutura da tabela `personalagenda`
 --
 
+DROP TABLE IF EXISTS `personalagenda`;
 CREATE TABLE `personalagenda` (
   `id_user` int(11) NOT NULL,
   `id_event` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `personalagenda`
+--
+
+INSERT INTO `personalagenda` (`id_user`, `id_event`) VALUES
+(3, 2);
 
 -- --------------------------------------------------------
 
@@ -109,6 +130,7 @@ CREATE TABLE `personalagenda` (
 -- Estrutura da tabela `rating`
 --
 
+DROP TABLE IF EXISTS `rating`;
 CREATE TABLE `rating` (
   `id_rating` int(11) NOT NULL,
   `id_user` int(11) NOT NULL,
@@ -123,6 +145,7 @@ CREATE TABLE `rating` (
 -- Estrutura da tabela `role`
 --
 
+DROP TABLE IF EXISTS `role`;
 CREATE TABLE `role` (
   `id_role` int(11) NOT NULL,
   `role_name` varchar(50) NOT NULL
@@ -142,6 +165,7 @@ INSERT INTO `role` (`id_role`, `role_name`) VALUES
 -- Estrutura da tabela `tent`
 --
 
+DROP TABLE IF EXISTS `tent`;
 CREATE TABLE `tent` (
   `id_tent` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
@@ -158,7 +182,8 @@ CREATE TABLE `tent` (
 
 INSERT INTO `tent` (`id_tent`, `name`, `id_faculty`, `location`, `open_time`, `close_time`, `description`) VALUES
 (1, 'Barraca da FEUP', 1, 'Rua Principal, Lugar 1', '20:00:00', '04:00:00', 'A melhor barraca do recinto!'),
-(2, 'Barraca da FEP', 2, 'Rua Principal, Lugar 2', '20:00:00', '04:00:00', 'Sempre a faturar.');
+(2, 'Barraca da FEP', 2, 'Rua Principal, Lugar 2', '20:00:00', '04:00:00', 'Sempre a faturar.'),
+(3, 'Turbinada', 3, 'A4', '20:00:00', '04:00:00', '');
 
 -- --------------------------------------------------------
 
@@ -166,6 +191,7 @@ INSERT INTO `tent` (`id_tent`, `name`, `id_faculty`, `location`, `open_time`, `c
 -- Estrutura da tabela `user`
 --
 
+DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `id_user` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
@@ -179,8 +205,9 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id_user`, `name`, `email`, `password_hash`, `id_role`) VALUES
-(1, 'Admin Queima', 'admin@queimaporto.pt', '$2y$10$lqJBLVugg647PYVj/AUltO/00RrnvmDOCAJT7Z8guTR5m9j1M7uQq', 1),
-(2, 'João Estudante', 'joao@estudante.pt', '$2y$10$IBLd7OJHYJXQKhucU3fnIOkqjWR9VHAgk/WaVm9dZ94e9omK1vCRy', 2);
+(1, 'Admin Queima', 'admin@queimaporto.pt', '$2y$10$pWzN2xM2ITX8ITrNcin/EeuJ5nLNH9ilWv9bMYB3w/zroisIfXRzW', 1),
+(2, 'João Estudante', 'joao@estudante.pt', 'joao123', 2),
+(3, 'João Paulo Brazeta Bastos', 'joaobrazeta@gmail.com', '$2y$10$BY4tQz/y2mw7fP9Xhx8KKevb335LhJv/kqP4sBMNdrIvp/xii376a', 1);
 
 --
 -- Índices para tabelas despejadas
@@ -258,7 +285,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de tabela `artist`
 --
 ALTER TABLE `artist`
-  MODIFY `id_artist` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_artist` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de tabela `event`
@@ -270,7 +297,7 @@ ALTER TABLE `event`
 -- AUTO_INCREMENT de tabela `faculty`
 --
 ALTER TABLE `faculty`
-  MODIFY `id_faculty` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_faculty` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de tabela `rating`
@@ -288,13 +315,13 @@ ALTER TABLE `role`
 -- AUTO_INCREMENT de tabela `tent`
 --
 ALTER TABLE `tent`
-  MODIFY `id_tent` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_tent` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de tabela `user`
 --
 ALTER TABLE `user`
-  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Restrições para despejos de tabelas
