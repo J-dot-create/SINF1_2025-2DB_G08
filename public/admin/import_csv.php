@@ -10,57 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
     if (!is_uploaded_file($file)) {
         $message = "Erro ao carregar o ficheiro.";
     } else {
-        $handle = fopen($file, "r");
-
-        if ($handle !== false) {
-            $rowNumber = 0;
-            $imported = 0;
-
-            while (($data = fgetcsv($handle, 1000, ";")) !== false) {
-                $rowNumber++;
-
-                // Ignorar cabeçalho
-                if ($rowNumber == 1) {
-                    continue;
-                }
-
-                if ($type === 'artists') {
-                    // CSV esperado: Nome;Género Musical;País;Biografia
-                    $name = trim($data[0] ?? '');
-                    $musical_genre = trim($data[1] ?? '');
-                    $country = trim($data[2] ?? '');
-                    $biography = trim($data[3] ?? '');
-
-                    if (!empty($name) && !empty($musical_genre) && !empty($country)) {
-                        if ($bll->createArtist($name, $musical_genre, $country, $biography)) {
-                            $imported++;
-                        }
-                    }
-                }
-
-                if ($type === 'events') {
-                    // CSV esperado: Nome;Descrição;Data;Localização;Tipo;ID Barraca
-                    $name = trim($data[0] ?? '');
-                    $description = trim($data[1] ?? '');
-                    $event_date = trim($data[2] ?? '');
-                    $location = trim($data[3] ?? '');
-                    $event_type = trim($data[4] ?? '');
-                    $id_tent = !empty($data[5]) ? intval($data[5]) : null;
-
-                    if (!empty($name) && !empty($event_date) && !empty($location) && !empty($event_type)) {
-                        if ($bll->createEvent($name, $description, $event_date, $location, $event_type, $id_tent)) {
-                            $imported++;
-                        }
-                    }
-                }
-            }
-
-            fclose($handle);
-
-            $message = "Importação concluída. Registos importados: " . $imported;
-        } else {
-            $message = "Não foi possível abrir o ficheiro CSV.";
-        }
+        $result = $bll->importCSV($type, $file);
+        $message = $result['message'];
     }
 }
 ?>

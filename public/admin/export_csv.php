@@ -17,25 +17,6 @@ if (!$userId || $roleId != 1) {
 
 $type = $_GET['type'] ?? null;
 
-function exportCSV($filename, $headers, $rows) {
-    header('Content-Type: text/csv; charset=utf-8');
-    header('Content-Disposition: attachment; filename="' . $filename . '"');
-
-    $output = fopen('php://output', 'w');
-
-    // BOM para Excel reconhecer UTF-8
-    fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
-
-    fputcsv($output, $headers, ';');
-
-    foreach ($rows as $row) {
-        fputcsv($output, $row, ';');
-    }
-
-    fclose($output);
-    exit();
-}
-
 if ($type === 'events') {
     $events = $bll->getAllEvents();
 
@@ -52,7 +33,7 @@ if ($type === 'events') {
         ];
     }
 
-    exportCSV(
+    $bll->exportCSV(
         'eventos.csv',
         ['ID', 'Nome', 'Descrição', 'Data', 'Localização', 'Tipo', 'ID Barraca'],
         $rows
@@ -73,7 +54,7 @@ if ($type === 'artists') {
         ];
     }
 
-    exportCSV(
+    $bll->exportCSV(
         'artistas.csv',
         ['ID', 'Nome', 'Género Musical', 'País', 'Biografia'],
         $rows
@@ -97,7 +78,7 @@ if ($type === 'tents') {
         ];
     }
 
-    exportCSV(
+    $bll->exportCSV(
         'barracas.csv',
         ['ID', 'Nome', 'Faculdade', 'Sigla', 'Localização', 'Abertura', 'Fecho', 'Descrição'],
         $rows
@@ -118,7 +99,7 @@ if ($type === 'faculties') {
         ];
     }
 
-    exportCSV(
+    $bll->exportCSV(
         'faculdades.csv',
         ['ID', 'Nome', 'Sigla', 'Descrição', 'Cor'],
         $rows
@@ -138,7 +119,7 @@ if ($type === 'users') {
         ];
     }
 
-    exportCSV(
+    $bll->exportCSV(
         'utilizadores.csv',
         ['ID', 'Nome', 'Email', 'Role'],
         $rows

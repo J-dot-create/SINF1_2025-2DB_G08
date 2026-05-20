@@ -170,34 +170,21 @@ $tents = $bll->getAllTents();
                     <?php foreach ($events as $event): ?>
                         <tr>
                             <td><?php echo htmlspecialchars($event['id_event']); ?></td>
-
                             <td><?php echo htmlspecialchars($event['name']); ?></td>
-
-                            <td>
-                                <?php echo date('d/m/Y H:i', strtotime($event['event_date'])); ?>
-                            </td>
-
+                            <td><?php echo date('d/m/Y H:i', strtotime($event['event_date'])); ?></td>
                             <td><?php echo htmlspecialchars($event['event_type']); ?></td>
-
                             <td><?php echo htmlspecialchars($event['location']); ?></td>
-
                             <td>
-                                <a
-                                    href="manage_events.php?edit=<?php echo $event['id_event']; ?>"
-                                    class="btn btn-sm btn-outline-secondary"
-                                >
+                                <a href="manage_events.php?edit=<?php echo $event['id_event']; ?>" class="btn btn-sm btn-outline-secondary">
                                     Editar
                                 </a>
 
-                                <a
-                                    href="../UserInterface/event_detail.php?id=<?php echo $event['id_event']; ?>"
-                                    class="btn btn-sm btn-outline-primary"
-                                >
+                                <a href="../UserInterface/event_detail.php?id=<?php echo $event['id_event']; ?>" class="btn btn-sm btn-outline-primary">
                                     Ver
                                 </a>
 
-                                <a 
-                                    href="manage_events.php?delete=<?php echo $event['id_event']; ?>" 
+                                <a
+                                    href="manage_events.php?delete=<?php echo $event['id_event']; ?>"
                                     class="btn btn-sm btn-outline-danger"
                                     onclick="return confirm('Tens a certeza que queres apagar este evento?');"
                                 >

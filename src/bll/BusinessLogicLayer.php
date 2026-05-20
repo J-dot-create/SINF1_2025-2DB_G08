@@ -32,7 +32,7 @@ class BusinessLogicLayer {
             $orderBy = "average_rating DESC, rating_count DESC, e.event_date ASC";
         }
 
-        $query = "SELECT 
+        $query = "SELECT
                     e.*,
                     COALESCE(pa_stats.popularity_count, 0) AS popularity_count,
                     COALESCE(rating_stats.average_rating, 0) AS average_rating,
@@ -50,6 +50,113 @@ class BusinessLogicLayer {
                       GROUP BY id_event
                   ) rating_stats ON e.id_event = rating_stats.id_event
                   ORDER BY $orderBy";
+
+        return $this->dal->executeSelect($query);
+    }
+
+    /**
+     * Pesquisa e filtra eventos por texto, data, faculdade, tipo e rating minimo.
+     * Tambem mantem as metricas de popularidade e rating usadas na interface.
+     */
+    public function getFilteredEvents($filters = []) {
+        $allowedSorts = ['date', 'popularity', 'rating'];
+        $sortBy = $filters['sort'] ?? 'date';
+
+        if (!in_array($sortBy, $allowedSorts, true)) {
+            $sortBy = 'date';
+        }
+
+        $orderBy = "e.event_date ASC";
+
+        if ($sortBy === 'popularity') {
+            $orderBy = "popularity_count DESC, e.event_date ASC";
+        } elseif ($sortBy === 'rating') {
+            $orderBy = "average_rating DESC, rating_count DESC, e.event_date ASC";
+        }
+
+        $where = [];
+        $params = [];
+        $types = "";
+
+        $search = trim($filters['search'] ?? '');
+        if ($search !== '') {
+            $where[] = "(e.name LIKE ? OR e.description LIKE ? OR e.location LIKE ?)";
+            $searchValue = "%" . $search . "%";
+            $params[] = $searchValue;
+            $params[] = $searchValue;
+            $params[] = $searchValue;
+            $types .= "sss";
+        }
+
+        $date = trim($filters['date'] ?? '');
+        if ($date !== '') {
+            $where[] = "DATE(e.event_date) = ?";
+            $params[] = $date;
+            $types .= "s";
+        }
+
+        $facultyId = intval($filters['faculty_id'] ?? 0);
+        if ($facultyId > 0) {
+            $where[] = "t.id_faculty = ?";
+            $params[] = $facultyId;
+            $types .= "i";
+        }
+
+        $eventType = trim($filters['event_type'] ?? '');
+        if ($eventType !== '') {
+            $where[] = "e.event_type = ?";
+            $params[] = $eventType;
+            $types .= "s";
+        }
+
+        $minimumRating = intval($filters['minimum_rating'] ?? 0);
+        if ($minimumRating >= 1 && $minimumRating <= 5) {
+            $where[] = "COALESCE(rating_stats.average_rating, 0) >= ?";
+            $params[] = $minimumRating;
+            $types .= "i";
+        }
+
+        $whereSql = "";
+        if (!empty($where)) {
+            $whereSql = "WHERE " . implode(" AND ", $where);
+        }
+
+        $query = "SELECT 
+                    e.*,
+                    t.name AS tent_name,
+                    f.name AS faculty_name,
+                    f.acronym AS faculty_acronym,
+                    COALESCE(pa_stats.popularity_count, 0) AS popularity_count,
+                    COALESCE(rating_stats.average_rating, 0) AS average_rating,
+                    COALESCE(rating_stats.rating_count, 0) AS rating_count
+                  FROM event e
+                  LEFT JOIN tent t ON e.id_tent = t.id_tent
+                  LEFT JOIN faculty f ON t.id_faculty = f.id_faculty
+                  LEFT JOIN (
+                      SELECT id_event, COUNT(*) AS popularity_count
+                      FROM personalagenda
+                      GROUP BY id_event
+                  ) pa_stats ON e.id_event = pa_stats.id_event
+                  LEFT JOIN (
+                      SELECT id_event, AVG(score) AS average_rating, COUNT(*) AS rating_count
+                      FROM rating
+                      WHERE id_event IS NOT NULL
+                      GROUP BY id_event
+                  ) rating_stats ON e.id_event = rating_stats.id_event
+                  $whereSql
+                  ORDER BY $orderBy";
+
+        return $this->dal->executeSelect($query, $params, $types);
+    }
+
+    /**
+     * Devolve os tipos de evento existentes para preencher filtros na interface.
+     */
+    public function getEventTypes() {
+        $query = "SELECT DISTINCT event_type
+                  FROM event
+                  WHERE event_type IS NOT NULL AND event_type <> ''
+                  ORDER BY event_type ASC";
 
         return $this->dal->executeSelect($query);
     }
@@ -649,6 +756,130 @@ class BusinessLogicLayer {
                   ORDER BY event_date ASC";
 
         return $this->dal->executeSelect($query, [$hours], "i");
+    }
+
+    /**
+     * Calcula estatisticas publicas para a pagina inicial.
+     * Mostra o evento mais popular pela agenda e o evento melhor cotado pelos ratings.
+     */
+    public function getPublicEventStats() {
+        $popularEvents = $this->getAllEvents('popularity');
+        $ratedEvents = $this->getAllEvents('rating');
+
+        $mostPopularEvent = $popularEvents[0] ?? null;
+        $highestRatedEvent = null;
+
+        foreach ($ratedEvents as $event) {
+            if (!empty($event['rating_count'])) {
+                $highestRatedEvent = $event;
+                break;
+            }
+        }
+
+        return [
+            'most_popular_event' => $mostPopularEvent,
+            'highest_rated_event' => $highestRatedEvent
+        ];
+    }
+
+    /**
+     * Envia uma resposta CSV para o browser.
+     */
+    public function exportCSV($filename, $headers, $rows) {
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+        $output = fopen('php://output', 'w');
+
+        // BOM para Excel reconhecer UTF-8.
+        fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+        fputcsv($output, $headers, ';');
+
+        foreach ($rows as $row) {
+            fputcsv($output, $row, ';');
+        }
+
+        fclose($output);
+        exit();
+    }
+
+    /**
+     * Importa artistas ou eventos a partir de um ficheiro CSV temporario.
+     */
+    public function importCSV($type, $filePath) {
+        if (!in_array($type, ['artists', 'events'], true)) {
+            return [
+                'success' => false,
+                'imported' => 0,
+                'message' => 'Tipo de dados invalido.'
+            ];
+        }
+
+        $handle = fopen($filePath, "r");
+
+        if ($handle === false) {
+            return [
+                'success' => false,
+                'imported' => 0,
+                'message' => 'Nao foi possivel abrir o ficheiro CSV.'
+            ];
+        }
+
+        $rowNumber = 0;
+        $imported = 0;
+
+        while (($data = fgetcsv($handle, 1000, ";")) !== false) {
+            $rowNumber++;
+
+            if ($rowNumber == 1) {
+                continue;
+            }
+
+            if ($type === 'artists' && $this->importArtistCSVRow($data)) {
+                $imported++;
+            }
+
+            if ($type === 'events' && $this->importEventCSVRow($data)) {
+                $imported++;
+            }
+        }
+
+        fclose($handle);
+
+        return [
+            'success' => true,
+            'imported' => $imported,
+            'message' => 'Importacao concluida. Registos importados: ' . $imported
+        ];
+    }
+
+    private function importArtistCSVRow($data) {
+        $name = trim($data[0] ?? '');
+        $musical_genre = trim($data[1] ?? '');
+        $country = trim($data[2] ?? '');
+        $biography = trim($data[3] ?? '');
+
+        if (empty($name) || empty($musical_genre) || empty($country)) {
+            return false;
+        }
+
+        return $this->createArtist($name, $musical_genre, $country, $biography);
+    }
+
+    private function importEventCSVRow($data) {
+        $name = trim($data[0] ?? '');
+        $description = trim($data[1] ?? '');
+        $event_date = trim($data[2] ?? '');
+        $location = trim($data[3] ?? '');
+        $event_type = trim($data[4] ?? '');
+        $id_tent = !empty($data[5]) ? intval($data[5]) : null;
+
+        if (empty($name) || empty($event_date) || empty($location) || empty($event_type)) {
+            return false;
+        }
+
+        return $this->createEvent($name, $description, $event_date, $location, $event_type, $id_tent);
     }
 
     /**

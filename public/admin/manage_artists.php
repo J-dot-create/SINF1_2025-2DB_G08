@@ -84,10 +84,10 @@ if (isset($_GET['edit'])) {
             <div class="row">
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Nome *</label>
-                    <input 
-                        type="text" 
-                        name="name" 
-                        class="form-control" 
+                    <input
+                        type="text"
+                        name="name"
+                        class="form-control"
                         value="<?php echo htmlspecialchars($artistToEdit['name'] ?? ''); ?>"
                         required
                     >
@@ -95,10 +95,10 @@ if (isset($_GET['edit'])) {
 
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Género musical *</label>
-                    <input 
-                        type="text" 
-                        name="musical_genre" 
-                        class="form-control" 
+                    <input
+                        type="text"
+                        name="musical_genre"
+                        class="form-control"
                         value="<?php echo htmlspecialchars($artistToEdit['musical_genre'] ?? ''); ?>"
                         required
                     >
@@ -106,10 +106,10 @@ if (isset($_GET['edit'])) {
 
                 <div class="col-md-4 mb-3">
                     <label class="form-label">País *</label>
-                    <input 
-                        type="text" 
-                        name="country" 
-                        class="form-control" 
+                    <input
+                        type="text"
+                        name="country"
+                        class="form-control"
                         value="<?php echo htmlspecialchars($artistToEdit['country'] ?? ''); ?>"
                         required
                     >
@@ -158,22 +158,16 @@ if (isset($_GET['edit'])) {
                             <td><?php echo htmlspecialchars($artist['musical_genre']); ?></td>
                             <td><?php echo htmlspecialchars($artist['country']); ?></td>
                             <td>
-                                <a 
-                                    href="../UserInterface/artist_detail.php?id=<?php echo $artist['id_artist']; ?>" 
-                                    class="btn btn-sm btn-outline-primary"
-                                >
+                                <a href="../UserInterface/artist_detail.php?id=<?php echo $artist['id_artist']; ?>" class="btn btn-sm btn-outline-primary">
                                     Ver
                                 </a>
 
-                                <a 
-                                    href="manage_artists.php?edit=<?php echo $artist['id_artist']; ?>" 
-                                    class="btn btn-sm btn-outline-warning"
-                                >
+                                <a href="manage_artists.php?edit=<?php echo $artist['id_artist']; ?>" class="btn btn-sm btn-outline-warning">
                                     Editar
                                 </a>
 
-                                <a 
-                                    href="manage_artists.php?delete=<?php echo $artist['id_artist']; ?>" 
+                                <a
+                                    href="manage_artists.php?delete=<?php echo $artist['id_artist']; ?>"
                                     class="btn btn-sm btn-outline-danger"
                                     data-confirm-delete="Tens a certeza que queres apagar este artista?"
                                 >
