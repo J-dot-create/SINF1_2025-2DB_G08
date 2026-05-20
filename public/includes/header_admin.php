@@ -49,6 +49,12 @@ if (!$userId || $roleId != 1) {
             </li>
 
             <li class="nav-item">
+                <a href="manage_event_artists.php" class="nav-link text-white">
+                    Associar Artistas a Eventos
+                </a>
+            </li>
+
+            <li class="nav-item">
                 <a href="manage_artists.php" class="nav-link text-white">
                     Gerir Artistas
                 </a>
@@ -92,11 +98,6 @@ if (!$userId || $roleId != 1) {
                 </a>
             </li>
 
-            <li class="nav-item">
-                <a href="manage_event_artists.php" class="nav-link text-white">
-                    Associar Artistas a Eventos
-                </a>
-            </li>
             <li class="nav-item">
                 <a href="export_csv.php" class="nav-link text-white">
                     Exportar CSV

@@ -12,7 +12,7 @@ $upcomingAlerts = $bll->getUpcomingAlerts(48);
                     <strong><?php echo htmlspecialchars($alertEvent['name']); ?></strong>
                     —
                     <?php echo date('d/m/Y H:i', strtotime($alertEvent['event_date'])); ?>
-                    em
+                    Local:
                     <?php echo htmlspecialchars($alertEvent['location']); ?>
 
                     <a href="/SINF1_2025-2DB_G08/public/UserInterface/event_detail.php?id=<?php echo $alertEvent['id_event']; ?>">
