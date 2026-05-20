@@ -20,14 +20,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_artist_event'])) 
 }
 
 // Remover associação
-if (isset($_GET['remove_event']) && isset($_GET['remove_artist'])) {
-    $id_event = intval($_GET['remove_event']);
-    $id_artist = intval($_GET['remove_artist']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_artist_event'])) {
+    if (!$bll->isValidCsrfToken($_POST['csrf_token'] ?? '')) {
+        $message = "Pedido inválido. Tenta novamente.";
+    } else {
+    $id_event = intval($_POST['id_event'] ?? 0);
+    $id_artist = intval($_POST['id_artist'] ?? 0);
 
     if ($bll->removeArtistFromEvent($id_event, $id_artist)) {
         $message = "Associação removida com sucesso.";
     } else {
         $message = "Erro ao remover associação.";
+    }
     }
 }
 
@@ -132,13 +136,15 @@ $associations = $bll->getAllEventArtists();
                                     Ver evento
                                 </a>
 
-                                <a
-                                    href="manage_event_artists.php?remove_event=<?php echo $association['id_event']; ?>&remove_artist=<?php echo $association['id_artist']; ?>"
-                                    class="btn btn-sm btn-outline-danger"
-                                    data-confirm-delete="Tens a certeza que queres remover este artista do evento?"
-                                >
-                                    Remover
-                                </a>
+                                <form method="POST" action="manage_event_artists.php" class="d-inline" data-confirm-delete="Tens a certeza que queres remover este artista do evento?">
+                                    <?php echo $bll->getCsrfInput(); ?>
+                                    <input type="hidden" name="remove_artist_event" value="1">
+                                    <input type="hidden" name="id_event" value="<?php echo $association['id_event']; ?>">
+                                    <input type="hidden" name="id_artist" value="<?php echo $association['id_artist']; ?>">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        Remover
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>

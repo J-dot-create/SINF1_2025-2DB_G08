@@ -49,20 +49,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
 }
 
 // Apagar utilizador
-if (isset($_GET['delete'])) {
-    $id_user = intval($_GET['delete']);
-
-    $currentUserId = $_SESSION['id_user'] ?? $_SESSION['user_id'] ?? null;
-
-    if ($currentUserId == $id_user) {
-        $message = "Não podes apagar o teu próprio utilizador enquanto estás autenticado.";
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
+    if (!$bll->isValidCsrfToken($_POST['csrf_token'] ?? '')) {
+        $message = "Pedido inválido. Tenta novamente.";
     } else {
-        if ($bll->deleteUser($id_user)) {
-            $message = "Utilizador apagado com sucesso.";
+        $id_user = intval($_POST['id_user'] ?? 0);
+
+        $currentUserId = $_SESSION['id_user'] ?? $_SESSION['user_id'] ?? null;
+
+        if ($currentUserId == $id_user) {
+        $message = "Não podes apagar o teu próprio utilizador enquanto estás autenticado.";
         } else {
+            if ($bll->deleteUser($id_user)) {
+            $message = "Utilizador apagado com sucesso.";
+            } else {
             $message = "Erro ao apagar utilizador. Pode ter agenda ou avaliações associadas.";
         }
-    }
+            }
+        }
 }
 
 $users = $bll->getAllUsers();
@@ -203,13 +207,14 @@ if (isset($_GET['edit'])) {
                                     Editar
                                 </a>
 
-                                <a
-                                    href="manage_users.php?delete=<?php echo $user['id_user']; ?>"
-                                    class="btn btn-sm btn-outline-danger"
-                                    data-confirm-delete="Tens a certeza que queres apagar este utilizador?"
-                                >
-                                    Apagar
-                                </a>
+                                <form method="POST" action="manage_users.php" class="d-inline" data-confirm-delete="Tens a certeza que queres apagar este utilizador?">
+                                    <?php echo $bll->getCsrfInput(); ?>
+                                    <input type="hidden" name="delete_user" value="1">
+                                    <input type="hidden" name="id_user" value="<?php echo $user['id_user']; ?>">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        Apagar
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>

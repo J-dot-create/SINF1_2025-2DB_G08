@@ -41,13 +41,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_artist'])) {
 }
 
 // Apagar artista
-if (isset($_GET['delete'])) {
-    $id_artist = intval($_GET['delete']);
-
-    if ($bll->deleteArtist($id_artist)) {
-        $message = "Artista apagado com sucesso.";
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_artist'])) {
+    if (!$bll->isValidCsrfToken($_POST['csrf_token'] ?? '')) {
+        $message = "Pedido inválido. Tenta novamente.";
     } else {
-        $message = "Erro ao apagar artista. Pode estar associado a um evento.";
+        $id_artist = intval($_POST['id_artist'] ?? 0);
+
+        if ($bll->deleteArtist($id_artist)) {
+            $message = "Artista apagado com sucesso.";
+        } else {
+            $message = "Erro ao apagar artista. Pode estar associado a um evento.";
+        }
     }
 }
 
@@ -166,13 +170,14 @@ if (isset($_GET['edit'])) {
                                     Editar
                                 </a>
 
-                                <a
-                                    href="manage_artists.php?delete=<?php echo $artist['id_artist']; ?>"
-                                    class="btn btn-sm btn-outline-danger"
-                                    data-confirm-delete="Tens a certeza que queres apagar este artista?"
-                                >
-                                    Apagar
-                                </a>
+                                <form method="POST" action="manage_artists.php" class="d-inline" data-confirm-delete="Tens a certeza que queres apagar este artista?">
+                                    <?php echo $bll->getCsrfInput(); ?>
+                                    <input type="hidden" name="delete_artist" value="1">
+                                    <input type="hidden" name="id_artist" value="<?php echo $artist['id_artist']; ?>">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        Apagar
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>

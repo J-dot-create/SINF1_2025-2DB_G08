@@ -954,5 +954,40 @@ class BusinessLogicLayer {
 
         return $stats;
     }
+
+    /**
+     * Gera ou devolve o token CSRF guardado na sessao de forma a evitar ataques CSRF.
+     */
+    public function getCsrfToken() {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+
+        return $_SESSION['csrf_token'];
+    }
+
+    /**
+     * Confirma se o token recebido pertence a sessao atual.
+     */
+    public function isValidCsrfToken($token) {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+
+        return isset($_SESSION['csrf_token'])
+            && is_string($token)
+            && hash_equals($_SESSION['csrf_token'], $token);
+    }
+
+    /**
+     * Cria o campo hidden usado nos formularios protegidos contra CSRF.
+     */
+    public function getCsrfInput() {
+        return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($this->getCsrfToken(), ENT_QUOTES, 'UTF-8') . '">';
+    }
 }
 ?>

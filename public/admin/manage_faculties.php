@@ -41,13 +41,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_faculty'])) {
 }
 
 // Apagar faculdade
-if (isset($_GET['delete'])) {
-    $id_faculty = intval($_GET['delete']);
-
-    if ($bll->deleteFaculty($id_faculty)) {
-        $message = "Faculdade apagada com sucesso.";
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_faculty'])) {
+    if (!$bll->isValidCsrfToken($_POST['csrf_token'] ?? '')) {
+        $message = "Pedido inválido. Tenta novamente.";
     } else {
-        $message = "Erro ao apagar faculdade. Pode estar associada a uma ou mais barracas.";
+        $id_faculty = intval($_POST['id_faculty'] ?? 0);
+
+        if ($bll->deleteFaculty($id_faculty)) {
+            $message = "Faculdade apagada com sucesso.";
+        } else {
+            $message = "Erro ao apagar faculdade. Pode estar associada a uma ou mais barracas.";
+        }
     }
 }
 
@@ -192,13 +196,14 @@ if (isset($_GET['edit'])) {
                                     Editar
                                 </a>
 
-                                <a
-                                    href="manage_faculties.php?delete=<?php echo $faculty['id_faculty']; ?>"
-                                    class="btn btn-sm btn-outline-danger"
-                                    data-confirm-delete="Tens a certeza que queres apagar esta faculdade?"
-                                >
-                                    Apagar
-                                </a>
+                                <form method="POST" action="manage_faculties.php" class="d-inline" data-confirm-delete="Tens a certeza que queres apagar esta faculdade?">
+                                    <?php echo $bll->getCsrfInput(); ?>
+                                    <input type="hidden" name="delete_faculty" value="1">
+                                    <input type="hidden" name="id_faculty" value="<?php echo $faculty['id_faculty']; ?>">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        Apagar
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>

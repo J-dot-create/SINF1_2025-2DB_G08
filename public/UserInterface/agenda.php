@@ -9,20 +9,28 @@ if (!isset($_SESSION['id_user']) && !isset($_SESSION['user_id'])) {
 $id_user = $_SESSION['id_user'] ?? $_SESSION['user_id'];
 $message = "";
 
-if (isset($_GET['add'])) {
-    $id_event = intval($_GET['add']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_event'])) {
+    if (!$bll->isValidCsrfToken($_POST['csrf_token'] ?? '')) {
+        $message = "Pedido inválido. Tenta novamente.";
+    } else {
+    $id_event = intval($_POST['id_event'] ?? 0);
 
     if ($bll->addEventToAgenda($id_user, $id_event)) {
         $message = "Evento adicionado à agenda.";
     } else {
         $message = "Este evento já está na tua agenda.";
     }
+    }
 }
 
-if (isset($_GET['remove'])) {
-    $id_event = intval($_GET['remove']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_event'])) {
+    if (!$bll->isValidCsrfToken($_POST['csrf_token'] ?? '')) {
+        $message = "Pedido inválido. Tenta novamente.";
+    } else {
+    $id_event = intval($_POST['id_event'] ?? 0);
     $bll->removeEventFromAgenda($id_user, $id_event);
     $message = "Evento removido da agenda.";
+    }
 }
 
 $agenda = $bll->getUserAgenda($id_user);
@@ -66,9 +74,14 @@ $agenda = $bll->getUserAgenda($id_user);
                             Ver detalhes
                         </a>
 
-                        <a href="agenda.php?remove=<?php echo $event['id_event']; ?>" class="btn btn-outline-danger w-100">
-                            Remover da agenda
-                        </a>
+                        <form method="POST" action="agenda.php" data-confirm-delete="Tens a certeza que queres remover este evento da agenda?">
+                            <?php echo $bll->getCsrfInput(); ?>
+                            <input type="hidden" name="remove_event" value="1">
+                            <input type="hidden" name="id_event" value="<?php echo $event['id_event']; ?>">
+                            <button type="submit" class="btn btn-outline-danger w-100">
+                                Remover da agenda
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>

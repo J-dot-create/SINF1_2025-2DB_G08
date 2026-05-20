@@ -50,13 +50,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_event'])) {
 }
 
 // Apagar evento
-if (isset($_GET['delete'])) {
-    $id_event = intval($_GET['delete']);
-
-    if ($bll->deleteEvent($id_event)) {
-        $message = "Evento apagado com sucesso.";
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_event'])) {
+    if (!$bll->isValidCsrfToken($_POST['csrf_token'] ?? '')) {
+        $message = "Pedido inválido. Tenta novamente.";
     } else {
-        $message = "Erro ao apagar evento.";
+        $id_event = intval($_POST['id_event'] ?? 0);
+
+        if ($bll->deleteEvent($id_event)) {
+            $message = "Evento apagado com sucesso.";
+        } else {
+            $message = "Erro ao apagar evento.";
+        }
     }
 }
 
@@ -186,13 +190,14 @@ $eventTypes = $bll->getEventTypes();
                                     Ver
                                 </a>
 
-                                <a
-                                    href="manage_events.php?delete=<?php echo $event['id_event']; ?>"
-                                    class="btn btn-sm btn-outline-danger"
-                                    onclick="return confirm('Tens a certeza que queres apagar este evento?');"
-                                >
-                                    Apagar
-                                </a>
+                                <form method="POST" action="manage_events.php" class="d-inline" data-confirm-delete="Tens a certeza que queres apagar este evento?">
+                                    <?php echo $bll->getCsrfInput(); ?>
+                                    <input type="hidden" name="delete_event" value="1">
+                                    <input type="hidden" name="id_event" value="<?php echo $event['id_event']; ?>">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        Apagar
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>

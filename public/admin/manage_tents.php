@@ -45,13 +45,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_tent'])) {
 }
 
 // Apagar barraca
-if (isset($_GET['delete'])) {
-    $id_tent = intval($_GET['delete']);
-
-    if ($bll->deleteTent($id_tent)) {
-        $message = "Barraca apagada com sucesso.";
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_tent'])) {
+    if (!$bll->isValidCsrfToken($_POST['csrf_token'] ?? '')) {
+        $message = "Pedido inválido. Tenta novamente.";
     } else {
-        $message = "Erro ao apagar barraca. Pode estar associada a eventos ou avaliações.";
+        $id_tent = intval($_POST['id_tent'] ?? 0);
+
+        if ($bll->deleteTent($id_tent)) {
+            $message = "Barraca apagada com sucesso.";
+        } else {
+            $message = "Erro ao apagar barraca. Pode estar associada a eventos ou avaliações.";
+        }
     }
 }
 
@@ -218,13 +222,14 @@ if (isset($_GET['edit'])) {
                                     Editar
                                 </a>
 
-                                <a 
-                                    href="manage_tents.php?delete=<?php echo $tent['id_tent']; ?>" 
-                                    class="btn btn-sm btn-outline-danger"
-                                    data-confirm-delete="Tens a certeza que queres apagar esta barraca?"
-                                >
-                                    Apagar
-                                </a>
+                                <form method="POST" action="manage_tents.php" class="d-inline" data-confirm-delete="Tens a certeza que queres apagar esta barraca?">
+                                    <?php echo $bll->getCsrfInput(); ?>
+                                    <input type="hidden" name="delete_tent" value="1">
+                                    <input type="hidden" name="id_tent" value="<?php echo $tent['id_tent']; ?>">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        Apagar
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>

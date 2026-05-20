@@ -72,9 +72,14 @@ if (!$event) {
         <?php endif; ?>
 
         <?php if (isset($_SESSION['id_user'])): ?>
-    <a href="agenda.php?add=<?php echo $event['id_event']; ?>" class="btn btn-success mt-3">
+    <form method="POST" action="agenda.php" class="d-inline">
+        <?php echo $bll->getCsrfInput(); ?>
+        <input type="hidden" name="add_event" value="1">
+        <input type="hidden" name="id_event" value="<?php echo $event['id_event']; ?>">
+        <button type="submit" class="btn btn-success mt-3">
         Adicionar à minha agenda
-    </a>
+        </button>
+    </form>
 
     <a href="rate_event.php?id=<?php echo $event['id_event']; ?>" class="btn btn-warning mt-3">
         Avaliar evento

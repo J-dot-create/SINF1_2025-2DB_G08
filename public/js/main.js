@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     // Confirmação antes de apagar
-    const deleteLinks = document.querySelectorAll("[data-confirm-delete]");
+    const deleteLinks = document.querySelectorAll("a[data-confirm-delete]");
 
     deleteLinks.forEach(function (link) {
         link.addEventListener("click", function (event) {
@@ -53,6 +53,18 @@ document.addEventListener("DOMContentLoaded", function () {
             } else {
                 input.type = "password";
                 button.textContent = "Mostrar";
+            }
+        });
+    });
+
+    const deleteForms = document.querySelectorAll("form[data-confirm-delete]");
+
+    deleteForms.forEach(function (form) {
+        form.addEventListener("submit", function (event) {
+            const message = form.getAttribute("data-confirm-delete") || "Tens a certeza que queres apagar este registo?";
+
+            if (!confirm(message)) {
+                event.preventDefault();
             }
         });
     });
