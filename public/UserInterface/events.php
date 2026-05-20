@@ -141,6 +141,15 @@ $eventTypes = $bll->getEventTypes();
                             <?php echo date('d M Y, H:i', strtotime($event['event_date'])); ?>
                         </h6>
 
+                        <?php if (strtotime($event['event_date']) >= time()): ?>
+                            <div
+                                class="event-countdown mb-3"
+                                data-countdown-target="<?php echo strtotime($event['event_date']) * 1000; ?>"
+                            >
+                                A calcular tempo restante...
+                            </div>
+                        <?php endif; ?>
+
                         <p class="card-text text-truncate" style="max-height: 3rem;">
                             <?php echo htmlspecialchars($event['description']); ?>
                         </p>

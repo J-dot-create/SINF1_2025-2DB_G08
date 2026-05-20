@@ -56,4 +56,45 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     });
+
+    // Atualiza o contador dos eventos futuros.
+    const countdowns = document.querySelectorAll("[data-countdown-target]");
+
+    function formatCountdown(milliseconds) {
+        if (milliseconds <= 0) {
+            return "O evento já começou";
+        }
+
+        const totalSeconds = Math.floor(milliseconds / 1000);
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+
+        if (days > 0) {
+            return `Faltam <strong>${days}d ${hours}h ${minutes}m</strong>`;
+        }
+
+        return `Faltam <strong>${hours}h ${minutes}m ${seconds}s</strong>`;
+    }
+
+    function updateCountdowns() {
+        const now = Date.now();
+
+        countdowns.forEach(function (countdown) {
+            const target = Number(countdown.getAttribute("data-countdown-target"));
+
+            if (Number.isNaN(target)) {
+                countdown.textContent = "";
+                return;
+            }
+
+            countdown.innerHTML = formatCountdown(target - now);
+        });
+    }
+
+    if (countdowns.length > 0) {
+        updateCountdowns();
+        setInterval(updateCountdowns, 1000);
+    }
 });

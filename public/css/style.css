@@ -68,6 +68,20 @@ h1, h2, h3, h4, h5 {
     color: #ffc107;
 }
 
+/* Contador dos eventos */
+.event-countdown {
+    background-color: #eef5ff;
+    border-left: 4px solid #0d6efd;
+    border-radius: 8px;
+    color: #0b4a8f;
+    font-size: 0.92rem;
+    padding: 0.65rem 0.8rem;
+}
+
+.event-countdown strong {
+    font-weight: 700;
+}
+
 /* Alertas */
 .alert {
     border-radius: 10px;
