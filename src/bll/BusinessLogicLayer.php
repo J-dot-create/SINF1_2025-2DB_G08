@@ -55,6 +55,37 @@ class BusinessLogicLayer {
     }
 
     /**
+     * Obtem eventos futuros ou passados, mantendo popularidade e rating.
+     */
+    public function getEventsByTimeStatus($status = 'upcoming') {
+        $isPast = $status === 'past';
+        $whereSql = $isPast ? "e.event_date < NOW()" : "e.event_date >= NOW()";
+        $orderBy = $isPast ? "e.event_date DESC" : "e.event_date ASC";
+
+        $query = "SELECT
+                    e.*,
+                    COALESCE(pa_stats.popularity_count, 0) AS popularity_count,
+                    COALESCE(rating_stats.average_rating, 0) AS average_rating,
+                    COALESCE(rating_stats.rating_count, 0) AS rating_count
+                  FROM event e
+                  LEFT JOIN (
+                      SELECT id_event, COUNT(*) AS popularity_count
+                      FROM personalagenda
+                      GROUP BY id_event
+                  ) pa_stats ON e.id_event = pa_stats.id_event
+                  LEFT JOIN (
+                      SELECT id_event, AVG(score) AS average_rating, COUNT(*) AS rating_count
+                      FROM rating
+                      WHERE id_event IS NOT NULL
+                      GROUP BY id_event
+                  ) rating_stats ON e.id_event = rating_stats.id_event
+                  WHERE $whereSql
+                  ORDER BY $orderBy";
+
+        return $this->dal->executeSelect($query);
+    }
+
+    /**
      * Pesquisa e filtra eventos por texto, data, faculdade, tipo e rating minimo.
      * Tambem mantem as metricas de popularidade e rating usadas na interface.
      */

@@ -2,7 +2,13 @@
 require_once __DIR__ . '/../src/bll/BusinessLogicLayer.php';
 
 $bll = new BusinessLogicLayer();
-$events = $bll->getAllEvents();
+$upcomingEvents = $bll->getEventsByTimeStatus('upcoming');
+$pastEvents = $bll->getEventsByTimeStatus('past');
+$events = !empty($upcomingEvents) ? $upcomingEvents : $pastEvents;
+$eventsSectionTitle = !empty($upcomingEvents) ? 'Próximos eventos' : 'Eventos anteriores';
+$emptyEventsMessage = !empty($upcomingEvents)
+    ? 'Ainda não existem eventos futuros agendados na base de dados.'
+    : 'Ainda não existem eventos registados na base de dados.';
 $publicStats = $bll->getPublicEventStats();
 $mostPopularEvent = $publicStats['most_popular_event'] ?? null;
 $highestRatedEvent = $publicStats['highest_rated_event'] ?? null;
@@ -80,7 +86,7 @@ include 'includes/header_ui.php';
 
 <section>
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h3 mb-0">Próximos eventos</h2>
+        <h2 class="h3 mb-0"><?php echo $eventsSectionTitle; ?></h2>
         <a href="UserInterface/events.php" class="btn btn-outline-primary btn-sm">
             Ver programa completo
         </a>
@@ -126,7 +132,7 @@ include 'includes/header_ui.php';
         <?php else: ?>
             <div class="col-12">
                 <div class="alert alert-info text-center">
-                    Ainda não existem eventos agendados na base de dados.
+                    <?php echo $emptyEventsMessage; ?>
                 </div>
             </div>
         <?php endif; ?>

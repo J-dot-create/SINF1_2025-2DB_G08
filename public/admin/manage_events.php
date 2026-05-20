@@ -62,6 +62,7 @@ if (isset($_GET['delete'])) {
 
 $events = $bll->getAllEvents();
 $tents = $bll->getAllTents();
+$eventTypes = $bll->getEventTypes();
 ?>
 
 <h1 class="display-5 border-bottom pb-2 mb-4">Gerir Eventos</h1>
@@ -113,9 +114,11 @@ $tents = $bll->getAllTents();
                     <label class="form-label">Tipo *</label>
                     <select name="event_type" class="form-select" required>
                         <option value="">Escolher tipo</option>
-                        <option value="Academic ceremony" <?php echo (($eventToEdit['event_type'] ?? '') === 'Academic ceremony') ? 'selected' : ''; ?>>Cerimónia académica</option>
-                        <option value="Concert" <?php echo (($eventToEdit['event_type'] ?? '') === 'Concert') ? 'selected' : ''; ?>>Concerto</option>
-                        <option value="Cultural activity" <?php echo (($eventToEdit['event_type'] ?? '') === 'Cultural activity') ? 'selected' : ''; ?>>Atividade cultural</option>
+                        <?php foreach ($eventTypes as $type): ?>
+                            <option value="<?php echo htmlspecialchars($type['event_type']); ?>" <?php echo (($eventToEdit['event_type'] ?? '') === $type['event_type']) ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($type['event_type']); ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
 
