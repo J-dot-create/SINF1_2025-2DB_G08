@@ -109,11 +109,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
     <div class="card-body">
         <h5>Artistas</h5>
         <pre>Nome;Género Musical;País;Biografia
-Dillaz;Hip-Hop;Portugal;Rapper português...</pre>
+
+Exemplo: Dillaz;Hip-Hop;Portugal;Rapper português famoso</pre>
 
         <h5>Eventos</h5>
         <pre>Nome;Descrição;Data;Localização;Tipo;ID Barraca
-Noite Académica;Concerto especial;2026-05-08 22:00:00;Palco Principal;Concert;</pre>
+
+Exemplo: Noite Académica;Concerto especial;2026-05-08 22:00:00;Palco Principal;Concert;</pre>
     </div>
 </div>
 
