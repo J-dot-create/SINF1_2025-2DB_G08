@@ -4,24 +4,24 @@ require_once __DIR__ . '/../dal/DataAccessLayer.php';
 /**
  * Business Logic Layer (BLL)
  *
- * Esta classe concentra as regras de negocio da aplicacao.
- * A interface chama metodos desta classe, e a BLL usa a DAL para aceder
- * diretamente a base de dados.
+ * Esta classe concentra as regras de negócio da aplicação.
+ * A interface chama métodos desta classe, e a BLL usa a DAL para aceder
+ * diretamente à base de dados.
  */
 class BusinessLogicLayer {
     private $dal;
 
     /**
-     * Cria a camada de acesso a dados que sera usada por todos os metodos.
+     * Cria a camada de acesso a dados que será usada por todos os métodos.
      */
     public function __construct() {
         $this->dal = new DataAccessLayer();
     }
 
     /**
-     * Obtem todos os eventos e junta informacao calculada para a listagem:
-     * popularidade pela agenda pessoal e rating medio pelas avaliacoes.
-     * A ordenacao pode ser por data, popularidade ou rating.
+     * Obtém todos os eventos e junta informação calculada para a listagem:
+     * popularidade pela agenda pessoal e rating médio pelas avaliações.
+     * A ordenação pode ser por data, popularidade ou rating.
      */
     public function getAllEvents($sortBy = 'date') {
         $orderBy = "e.event_date ASC";
@@ -55,7 +55,7 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Obtem eventos futuros ou passados, mantendo popularidade e rating.
+     * Obtém eventos futuros ou passados, mantendo popularidade e rating.
      */
     public function getEventsByTimeStatus($status = 'upcoming') {
         $isPast = $status === 'past';
@@ -86,8 +86,8 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Pesquisa e filtra eventos por texto, data, faculdade, tipo e rating minimo.
-     * Tambem mantem as metricas de popularidade e rating usadas na interface.
+     * Pesquisa e filtra eventos por texto, data, faculdade, tipo e rating mínimo.
+     * Também mantém as métricas de popularidade e rating usadas na interface.
      */
     public function getFilteredEvents($filters = []) {
         $allowedSorts = ['date', 'popularity', 'rating'];
@@ -194,8 +194,8 @@ class BusinessLogicLayer {
 
     /**
      * Regista um novo utilizador como estudante.
-     * Primeiro confirma se o email ja existe. Se existir, devolve false.
-     * A password e guardada com hash para nao ficar em texto simples.
+     * Primeiro confirma se o email já existe. Se existir, devolve false.
+     * A password é guardada com hash para não ficar em texto simples.
      */
     public function registerUser($name, $email, $password) {
         $checkQuery = "SELECT * FROM user WHERE email = ? LIMIT 1";
@@ -214,7 +214,7 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Verifica se um email ja esta registado.
+     * Verifica se um email já está registado.
      */
     public function isEmailRegistered($email) {
         $query = "SELECT id_user FROM user WHERE email = ?";
@@ -223,7 +223,7 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Autentica um utilizador atraves do email e password.
+     * Autentica um utilizador através do email e password.
      * Primeiro tenta validar uma password com hash.
      * Se encontrar uma password antiga em texto simples, valida-a e migra-a
      * automaticamente para hash.
@@ -330,7 +330,7 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Calcula o rating medio de um evento.
+     * Calcula o rating médio de um evento.
      */
     public function getAverageEventRating($id_event) {
         $query = "SELECT AVG(score) AS average_rating 
@@ -341,7 +341,7 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Calcula o rating medio de uma barraca.
+     * Calcula o rating médio de uma barraca.
      */
     public function getAverageTentRating($id_tent) {
         $query = "SELECT AVG(score) AS average_rating 
@@ -370,7 +370,7 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Atualiza os dados que o utilizador pode editar no proprio perfil.
+     * Atualiza os dados que o utilizador pode editar no próprio perfil.
      */
     public function updateUserProfile($id_user, $name, $email) {
         $query = "UPDATE user 
@@ -380,8 +380,8 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Adiciona um evento a agenda pessoal do utilizador.
-     * Se o evento ja existir na agenda, nao duplica o registo.
+     * Adiciona um evento à agenda pessoal do utilizador.
+     * Se o evento já existir na agenda, não duplica o registo.
      */
     public function addEventToAgenda($id_user, $id_event) {
         $check = "SELECT * FROM personalagenda 
@@ -419,8 +419,8 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Regista ou atualiza a avaliacao de um utilizador para um evento.
-     * Cada utilizador tem apenas uma avaliacao por evento.
+     * Regista ou atualiza a avaliação de um utilizador para um evento.
+     * Cada utilizador tem apenas uma avaliação por evento.
      */
     public function rateEvent($id_user, $id_event, $score) {
         $check = "SELECT * FROM rating 
@@ -440,8 +440,8 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Regista ou atualiza a avaliacao de um utilizador para uma barraca.
-     * Cada utilizador tem apenas uma avaliacao por barraca.
+     * Regista ou atualiza a avaliação de um utilizador para uma barraca.
+     * Cada utilizador tem apenas uma avaliação por barraca.
      */
     public function rateTent($id_user, $id_tent, $score) {
         $check = "SELECT * FROM rating 
@@ -461,7 +461,7 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Cria um novo evento. A barraca associada e opcional.
+     * Cria um novo evento. A barraca associada é opcional.
      */
     public function createEvent($name, $description, $event_date, $location, $event_type, $id_tent = null) {
         $query = "INSERT INTO event (name, description, event_date, location, event_type, id_tent)
@@ -634,7 +634,7 @@ class BusinessLogicLayer {
 
     /**
      * Associa um artista a um evento.
-     * Antes de inserir, confirma se a associacao ainda nao existe.
+     * Antes de inserir, confirma se a associação ainda não existe.
      */
     public function addArtistToEvent($id_event, $id_artist) {
         $check = "SELECT * FROM event_artist
@@ -653,7 +653,7 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Remove a associacao entre um artista e um evento.
+     * Remove a associação entre um artista e um evento.
      */
     public function removeArtistFromEvent($id_event, $id_artist) {
         $query = "DELETE FROM event_artist
@@ -663,7 +663,7 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Lista todas as associacoes entre eventos e artistas com nomes legiveis.
+     * Lista todas as associações entre eventos e artistas com nomes legíveis.
      */
     public function getAllEventArtists() {
         $query = "SELECT 
@@ -698,7 +698,7 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Devolve todas as roles disponiveis para atribuir a utilizadores.
+     * Devolve todas as roles disponíveis para atribuir a utilizadores.
      */
     public function getAllRoles() {
         $query = "SELECT 
@@ -711,8 +711,8 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Cria um utilizador atraves do painel de administracao.
-     * Tambem impede emails duplicados e guarda a password com hash.
+     * Cria um utilizador através do painel de administração.
+     * Também impede emails duplicados e guarda a password com hash.
      */
     public function createUserByAdmin($name, $email, $password, $id_role) {
         $checkQuery = "SELECT * FROM user WHERE email = ? LIMIT 1";
@@ -735,7 +735,7 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Atualiza nome, email e role de um utilizador atraves do admin.
+     * Atualiza nome, email e role de um utilizador através do admin.
      */
     public function updateUserByAdmin($id_user, $name, $email, $id_role) {
         $query = "UPDATE user
@@ -750,8 +750,8 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Atualiza a password de um utilizador atraves do admin.
-     * A nova password e sempre guardada como hash.
+     * Atualiza a password de um utilizador através do admin.
+     * A nova password é sempre guardada como hash.
      */
     public function updateUserPasswordByAdmin($id_user, $password) {
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
@@ -777,8 +777,8 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Devolve eventos que vao acontecer dentro das proximas horas indicadas.
-     * E usado para mostrar alertas de eventos proximos.
+     * Devolve eventos que vão acontecer dentro das próximas horas indicadas.
+     * É usado para mostrar alertas de eventos próximos.
      */
     public function getUpcomingAlerts($hours = 48) {
         $query = "SELECT *
@@ -790,7 +790,7 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Calcula estatisticas publicas para a pagina inicial.
+     * Calcula estatísticas públicas para a página inicial.
      * Mostra o evento mais popular pela agenda e o evento melhor cotado pelos ratings.
      */
     public function getPublicEventStats() {
@@ -814,7 +814,7 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Envia uma resposta CSV para o browser.
+     * Envia uma resposta CSV para o navegador.
      */
     public function exportCSV($filename, $headers, $rows) {
         header('Content-Type: text/csv; charset=utf-8');
@@ -836,14 +836,14 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Importa artistas ou eventos a partir de um ficheiro CSV temporario.
+     * Importa artistas ou eventos a partir de um ficheiro CSV temporário.
      */
     public function importCSV($type, $filePath) {
         if (!in_array($type, ['artists', 'events'], true)) {
             return [
                 'success' => false,
                 'imported' => 0,
-                'message' => 'Tipo de dados invalido.'
+                'message' => 'Tipo de dados inválido.'
             ];
         }
 
@@ -853,7 +853,7 @@ class BusinessLogicLayer {
             return [
                 'success' => false,
                 'imported' => 0,
-                'message' => 'Nao foi possivel abrir o ficheiro CSV.'
+                'message' => 'Não foi possível abrir o ficheiro CSV.'
             ];
         }
 
@@ -881,10 +881,13 @@ class BusinessLogicLayer {
         return [
             'success' => true,
             'imported' => $imported,
-            'message' => 'Importacao concluida. Registos importados: ' . $imported
+            'message' => 'Importação concluída. Registos importados: ' . $imported
         ];
     }
 
+    /**
+     * Importa uma linha de CSV como artista, se tiver os campos obrigatórios.
+     */
     private function importArtistCSVRow($data) {
         $name = trim($data[0] ?? '');
         $musical_genre = trim($data[1] ?? '');
@@ -898,6 +901,9 @@ class BusinessLogicLayer {
         return $this->createArtist($name, $musical_genre, $country, $biography);
     }
 
+    /**
+     * Importa uma linha de CSV como evento, se tiver os campos obrigatórios.
+     */
     private function importEventCSVRow($data) {
         $name = trim($data[0] ?? '');
         $description = trim($data[1] ?? '');
@@ -914,11 +920,11 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Calcula estatisticas simples para o dashboard de administracao:
+     * Calcula estatísticas simples para o dashboard de administração:
      * totais, evento mais popular e barraca melhor avaliada.
      */
     public function getAdminStats() {
-        // Agrega estatisticas simples para o painel principal sem expor SQL na interface.
+        // Agrega estatísticas simples para o painel principal sem expor SQL na interface.
         $stats = [];
 
         $stats['total_events'] = $this->dal->executeSelect("SELECT COUNT(*) AS total FROM event")[0]['total'] ?? 0;
