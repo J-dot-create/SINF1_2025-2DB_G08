@@ -956,7 +956,11 @@ class BusinessLogicLayer {
     }
 
     /**
-     * Gera ou devolve o token CSRF guardado na sessao de forma a evitar ataques CSRF.
+     * Gera ou devolve o token CSRF guardado na sessao.
+     *
+     * Este token identifica os formularios criados pela propria aplicacao.
+     * Assim, a aplicacao consegue distinguir um pedido legitimo de um pedido
+     * falso enviado por outro site enquanto o utilizador esta autenticado.
      */
     public function getCsrfToken() {
         if (session_status() !== PHP_SESSION_ACTIVE) {
@@ -972,6 +976,9 @@ class BusinessLogicLayer {
 
     /**
      * Confirma se o token recebido pertence a sessao atual.
+     *
+     * Protege acoes sensiveis feitas por POST, como apagar registos,
+     * remover associacoes ou alterar a agenda do utilizador.
      */
     public function isValidCsrfToken($token) {
         if (session_status() !== PHP_SESSION_ACTIVE) {
@@ -985,6 +992,9 @@ class BusinessLogicLayer {
 
     /**
      * Cria o campo hidden usado nos formularios protegidos contra CSRF.
+     *
+     * Cada formulario envia este valor escondido e, antes de executar a acao,
+     * a pagina confirma o token com isValidCsrfToken().
      */
     public function getCsrfInput() {
         return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($this->getCsrfToken(), ENT_QUOTES, 'UTF-8') . '">';
